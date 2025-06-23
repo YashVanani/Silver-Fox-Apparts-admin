@@ -1,32 +1,31 @@
 'use client';
 
-import { useState } from 'react';
-import Header from '../Components/Header';
-import UserList from '../Components/UserList';
-import BookingList from '../Components/BookingList';
+import { useEffect } from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import { useRouter } from 'next/navigation';
+import Login from '../Components/Login';
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState('users');
+  const { currentUser } = useAuth();
+  const router = useRouter();
 
-  const handleTabChange = (tab) => {
-    setActiveTab(tab);
-  };
+  useEffect(() => {
+    if (currentUser) {
+      router.push('/dashboard');
+    }
+  }, [currentUser, router]);
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <Header onTabChange={handleTabChange} />
-      
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
-        <div className="space-y-4 sm:space-y-6">
-          {activeTab === 'users' && (
-            <UserList />
-          )}
-
-          {activeTab === 'booking' && (
-            <BookingList />
-          )}
+  // Show loading while checking authentication
+  if (currentUser) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Redirecting to dashboard...</p>
         </div>
-      </main>
-    </div>
-  );
+      </div>
+    );
+  }
+
+  return <Login />;
 }
